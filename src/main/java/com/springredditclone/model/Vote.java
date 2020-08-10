@@ -17,15 +17,14 @@ import static javax.persistence.GenerationType.SEQUENCE;
 @Entity
 @Builder
 public class Vote {
-    @Id
-    @GeneratedValue(strategy = SEQUENCE)
-    private Long voteId;
-    private VoteType voteType;
-    @NotNull
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "postId", referencedColumnName = "postId")
-    private Post post;
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "userId", referencedColumnName = "userId")
-    private Users user;
+	@Id
+	@GeneratedValue(strategy = SEQUENCE)
+	private Long voteId;
+	private VoteType voteType;
+	@ManyToOne(fetch = LAZY)
+	@JoinColumn(name = "postId", referencedColumnName = "postId")
+	private Post post;
+	@ManyToOne(fetch = LAZY)
+	@JoinColumn(name = "userId", referencedColumnName = "userId")
+	private Users user;
 }

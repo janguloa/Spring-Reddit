@@ -5,6 +5,7 @@ import static java.time.Instant.now;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -62,7 +63,7 @@ public class AuthService {
 	}
 
 	@Transactional(readOnly = true)
-	Users getCurrentUser() {
+	public Users getCurrentUser() {
 
 		org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User) SecurityContextHolder
 				.getContext().getAuthentication().getPrincipal();
@@ -117,4 +118,10 @@ public class AuthService {
 		userRepository.save(user);
 	}
 
+	public boolean isLoggedIn() {
+
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+		return !(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated();
+	}
 }

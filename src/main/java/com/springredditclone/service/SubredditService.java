@@ -13,10 +13,11 @@ import com.springredditclone.model.Subreddit;
 import com.springredditclone.repository.SubredditRepository;
 import static java.util.stream.Collectors.toList;
 import lombok.AllArgsConstructor;
-import static java.time.Instant.now;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class SubredditService {
 
 	private final SubredditRepository subredditRepository;
@@ -32,13 +33,13 @@ public class SubredditService {
 	@Transactional
 	public SubredditDto save(SubredditDto subredditDto) {
 
-		Subreddit subreddit = subredditRepository.save(mapToSubreddit(subredditDto));
-		subredditDto.setId(subreddit.getId());
+		Subreddit save = subredditRepository.save(mapToSubreddit(subredditDto));
+		subredditDto.setId(save.getId());
 
 		return subredditDto;
 	}
 
-	@Transactional(readOnly = true)
+	// @Transactional(readOnly = true)
 	public SubredditDto getSubreddit(Long id) {
 
 		Subreddit subreddit = subredditRepository.findById(id)
@@ -49,16 +50,19 @@ public class SubredditService {
 	}
 
 	private SubredditDto mapToDto(Subreddit subreddit) {
-
-		return SubredditDto.builder().name(subreddit.getName()).id(subreddit.getId())
-				.postCount(subreddit.getPosts().size()).build();
-
+		return SubredditDto.builder()
+				.name(subreddit.getName())
+				.id(subreddit.getId())
+				.postCount(subreddit.getPosts().size())
+				.build();
 	}
 
 	private Subreddit mapToSubreddit(SubredditDto subredditDto) {
-
-		return Subreddit.builder().name("/r/" + subredditDto.getName()).description(subredditDto.getDescription())
-				.user(authService.getCurrentUser()).createdDate(now()).build();
-
+		return Subreddit.builder()
+				.name(subredditDto.getName())
+				.description(subredditDto.getDescription())
+				.user(authService.getCurrentUser())
+				.createdDate(now())
+				.build();
 	}
 }
