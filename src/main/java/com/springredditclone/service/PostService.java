@@ -72,7 +72,7 @@ public class PostService {
 	public List<PostResponse> getPostsBySubreddit(Long subredditId) {
 
 		Subreddit subreddit = subredditRepository.findById(subredditId)
-				.orElseThrow(() -> new SubredditNotFoundException(subredditId.toString()));
+				.orElseThrow(() -> new SubredditNotFoundException("Id no encontrado con el número: " +subredditId.toString()));
 
 		List<Post> posts = postRepository.findAllBySubreddit(subreddit);
 
@@ -82,31 +82,32 @@ public class PostService {
 	@Transactional(readOnly = true)
 	public List<PostResponse> getPostsByUsername(String username) {
 
-		Users user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
+		Users user = userRepository.findByUsername(username)
+				.orElseThrow(() -> new UsernameNotFoundException(username));
 
 		return postRepository.findByUser(user).stream().map(this::mapToDto).collect(toList());
 
 	}
 
-	private PostResponse mapToDto(List<Post> postLista) {
-
-		PostResponse postRep = new PostResponse();
-
-		postLista.stream().forEach((p) -> {
-
-			postRep.setId(p.getPostId());
-			postRep.setSubredditName(p.getSubreddit().getName());
-			postRep.setCommentCount(commentCount(p));
-			postRep.setDuration(getDuration(p));
-			postRep.setUpVote(isPostUpVoted(p));
-			postRep.setDownVote(isPostDownVoted(p));
-
-		});
-
-		return PostResponse.builder().id(postRep.getId()).subredditName(postRep.getSubredditName())
-				.commentCount(postRep.getCommentCount()).duration(postRep.getDuration()).upVote(postRep.isUpVote())
-				.downVote(postRep.isDownVote()).build();
-	}
+//	private PostResponse mapToDto(List<Post> postLista) {
+//
+//		PostResponse postRep = new PostResponse();
+//
+//		postLista.stream().forEach((p) -> {
+//
+//			postRep.setId(p.getPostId());
+//			postRep.setSubredditName(p.getSubreddit().getName());
+//			postRep.setCommentCount(commentCount(p));
+//			postRep.setDuration(getDuration(p));
+//			postRep.setUpVote(isPostUpVoted(p));
+//			postRep.setDownVote(isPostDownVoted(p));
+//
+//		});
+//
+//		return PostResponse.builder().id(postRep.getId()).subredditName(postRep.getSubredditName())
+//				.commentCount(postRep.getCommentCount()).duration(postRep.getDuration()).upVote(postRep.isUpVote())
+//				.downVote(postRep.isDownVote()).build();
+//	}
 
 	private PostResponse mapToDto(Post post) {
 

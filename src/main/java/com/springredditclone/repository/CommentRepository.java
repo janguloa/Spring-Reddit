@@ -11,6 +11,7 @@ import com.springredditclone.model.Users;
 
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
+	
     List<Comment> findByPost(Post post);
 
     List<Comment> findAllByUser(Users user);

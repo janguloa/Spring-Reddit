@@ -39,7 +39,6 @@ public class SubredditService {
 		return subredditDto;
 	}
 
-	// @Transactional(readOnly = true)
 	public SubredditDto getSubreddit(Long id) {
 
 		Subreddit subreddit = subredditRepository.findById(id)
