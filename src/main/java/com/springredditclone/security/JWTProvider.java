@@ -14,19 +14,25 @@ import java.security.cert.CertificateException;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import com.springredditclone.exception.SpringRedditException;
-
+import java.sql.Date;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import java.time.Instant;
+import static java.util.Date.from;
+
 
 @Service
 public class JWTProvider {
 
 	private KeyStore keyStore;
+	@Value("${jwt.expiration.time}")
+	private Long jwtExpirationInMillis;
 
 	@PostConstruct
 	public void init() {
@@ -35,17 +41,31 @@ public class JWTProvider {
 			InputStream resourceAsStream = getClass().getResourceAsStream("/springblog.jks");
 			keyStore.load(resourceAsStream, "secret".toCharArray());
 		} catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException e) {
-			// throw // new SpringRedditException("Exception occured while loading
-			// keystore");
-			e.printStackTrace();
+			 throw  new SpringRedditException("Exception occured while loading keystore");
+			//e.printStackTrace();
 		}
 	}
 
 	public String generateToken(Authentication authentication) {
 		User principal = (User) authentication.getPrincipal();
-		return Jwts.builder().setSubject(principal.getUsername()).signWith(getPrivateKey()).compact();
+		return Jwts.builder()
+				.setSubject(principal.getUsername())
+				.setIssuedAt(from(Instant.now()))
+				.signWith(getPrivateKey())
+				.setExpiration(Date.from(Instant.now().plusMillis(jwtExpirationInMillis)))
+				.compact();
 	}
 
+	
+	public String generateTokenWithUserName(String username) {
+		return Jwts.builder()
+		.setSubject(username)
+		.setIssuedAt(from(Instant.now()))
+		.signWith(getPrivateKey())
+		.setExpiration(Date.from(Instant.now().plusMillis(jwtExpirationInMillis)))
+		.compact();
+		}
+	
 	private PrivateKey getPrivateKey() {
 		try {
 			return (PrivateKey) keyStore.getKey("springblog", "secret".toCharArray());
@@ -72,4 +92,8 @@ public class JWTProvider {
 
 		return claims.getSubject();
 	}
+	
+	public Long getJwtExpirationInMillis() {
+		return jwtExpirationInMillis;
+		}
 }
